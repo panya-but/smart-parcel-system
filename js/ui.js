@@ -2,8 +2,25 @@ function updateHeaderBadge() {
     const avatar = document.getElementById("user-role-avatar");
     const nameEl = document.getElementById("user-display-name");
     const roleEl = document.getElementById("user-display-role");
+    const badge = document.getElementById("user-profile-badge");
+    const btnChangePass = document.getElementById("btn-header-change-pass");
+    const btnLogin = document.getElementById("btn-header-login");
+    const btnLogout = document.getElementById("btn-header-logout");
 
-    if (!currentUser) return;
+    // หากยังไม่ได้เข้าสู่ระบบ หรือยังไม่ได้รับการอนุมัติ -> ซ่อนปุ่มออกจากระบบ แสดงปุ่มเข้าสู่ระบบ
+    if (!currentUser || currentUser.status !== 'approved') {
+        if (badge) badge.classList.add("hidden");
+        if (btnChangePass) btnChangePass.classList.add("hidden");
+        if (btnLogin) btnLogin.classList.remove("hidden");
+        if (btnLogout) badge.classList.add("hidden");
+        return;
+    }
+
+    // เมื่อเข้าสู่ระบบและได้รับการอนุมัติแล้ว -> ซ่อนปุ่มเข้าสู่ระบบ แสดงปุ่มออกจากระบบ
+    if (badge) badge.classList.remove("hidden");
+    if (btnChangePass) btnChangePass.classList.remove("hidden");
+    if (btnLogin) btnLogin.classList.add("hidden");      // ซ่อนปุ่ม เข้าสู่ระบบ / สมัครสมาชิก
+    if (btnLogout) btnLogout.classList.remove("hidden"); // แสดงปุ่ม ออกจากระบบ
 
     if (currentUser.role === 'guard') {
         avatar.textContent = "G"; avatar.className = "w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold";
@@ -17,13 +34,28 @@ function updateHeaderBadge() {
         roleEl.textContent = `ตึก ${currentUser.building} - ห้อง ${currentUser.room} (${currentUser.provider === 'line' ? 'LINE' : 'Email'})`;
     } else {
         avatar.textContent = "A"; avatar.className = "w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-bold";
-        nameEl.textContent = currentUser.name; roleEl.textContent = "บทบาท: Administrator";
+        nameEl.textContent = currentUser.name; roleEl.textContent = "บทบาท: Administrator (นิติบุคคล)";
     }
 }
 
 function renderAllViews() {
     updateHeaderBadge();
 
+    const viewGuest = document.getElementById("view-guest");
+
+    // ซ่อนแผงควบคุมทั้งหมดหากยังไม่อนุมัติหรือยังไม่ได้เข้าสู่ระบบ
+    if (!currentUser || currentUser.status !== 'approved') {
+        ['guard', 'resident', 'admin'].forEach(r => {
+            const v = document.getElementById(`view-${r}`);
+            if (v) v.classList.add("hidden");
+        });
+        if (viewGuest) viewGuest.classList.remove("hidden");
+        return;
+    }
+
+    if (viewGuest) viewGuest.classList.add("hidden");
+
+    // แสดงเฉพาะแผงควบคุมตามบทบาทผู้ใช้งาน
     ['guard', 'resident', 'admin'].forEach(r => {
         const view = document.getElementById(`view-${r}`);
         if (view) {
@@ -34,7 +66,12 @@ function renderAllViews() {
 
     if (currentUser.role === 'guard') renderGuardParcelTable();
     if (currentUser.role === 'resident') renderResidentCards();
-    if (currentUser.role === 'admin') { renderAdminTable(); renderAuditLogs(); }
+    if (currentUser.role === 'admin') { 
+        renderPendingUsersTable(); 
+        renderUserManagementTable(); 
+        renderAdminTable(); 
+        renderAuditLogs(); 
+    }
 
     updateStats();
 }
