@@ -23,28 +23,30 @@ function switchAuthMode(mode) {
 }
 
 function switchLoginTab(type) {
-    ['email', 'line', 'guard'].forEach(t => {
+    ['email', 'line', 'guard', 'admin'].forEach(t => {
         const btn = document.getElementById(`login-tab-${t}`);
         const form = document.getElementById(`login-form-${t}`);
+        if (!btn || !form) return;
         if (t === type) {
-            btn.className = "py-2 rounded-xl text-brand-600 bg-white shadow-sm transition-all font-bold";
+            btn.className = "py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all text-[11px]";
             form.classList.remove("hidden");
         } else {
-            btn.className = "py-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all";
+            btn.className = "py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all text-[11px]";
             form.classList.add("hidden");
         }
     });
 }
 
 function switchRegisterTab(type) {
-    ['email', 'line'].forEach(t => {
+    ['email', 'line', 'guard'].forEach(t => {
         const btn = document.getElementById(`reg-tab-${t}`);
         const form = document.getElementById(`register-form-${t}`);
+        if (!btn || !form) return;
         if (t === type) {
-            btn.className = "py-2 rounded-xl text-brand-600 bg-white shadow-sm transition-all font-bold";
+            btn.className = "py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all text-[11px]";
             form.classList.remove("hidden");
         } else {
-            btn.className = "py-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all";
+            btn.className = "py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all text-[11px]";
             form.classList.add("hidden");
         }
     });
@@ -57,12 +59,13 @@ function populateLineUsersDropdown() {
     if (lineUsers.length === 0) {
         select.innerHTML = `<option value="">ไม่พบบัญชี LINE (โปรดลงทะเบียนก่อน)</option>`;
     } else {
-        select.innerHTML = lineUsers.map(u => `<option value="${u.id}">${u.name} (${u.building} - ห้อง ${u.room})</option>`).join("");
+        select.innerHTML = lineUsers.map(u => `<option value="${u.id}">${u.name} (${u.building} - ห้อง ${u.room}) [${u.status === 'approved' ? 'อนุมัติแล้ว' : 'รออนุมัติ'}]</option>`).join("");
     }
 }
 
 function handleEmailRegister(e) {
     e.preventDefault();
+    // ดึงข้อมูลจากฟอร์ม
     const username = document.getElementById("reg-email-username").value.trim();
     const userId = document.getElementById("reg-email-userid").value.trim();
     const name = document.getElementById("reg-email-fullname").value.trim();
@@ -85,19 +88,21 @@ function handleEmailRegister(e) {
         room: room,
         email: email,
         provider: "email",
-        role: "resident"
+        role: "resident",
+        status: "pending", // กำหนดสถานะการสมัครเป็นรออนุมัติ
+        regDate: new Date().toISOString().slice(0,10)
     };
 
     users.push(newUser);
+    currentUser = null; // กำหนดให้ยังไม่เข้าสู่ระบบอัตโนมัติ ต้องรอแอดมินอนุมัติก่อน
     saveData();
     updateRoomOptions();
 
-    showToast("🎉 ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบด้วยไอดีของคุณ", "success");
-    addAuditLog("USER_REGISTER", `ลงทะเบียนผู้ใช้ใหม่ ${name} (${building} ห้อง ${room}) ผ่านอีเมล`, "ระบบ");
+    closeModal('modal-login');
+    showToast("📝 ลงทะเบียนเรียบร้อยแล้ว! กรุณารอนิติบุคคลอนุมัติตัวตน และเข้าสู่ระบบใหม่อีกครั้ง", "info");
+    addAuditLog("USER_REGISTER", `ลูกห้องใหม่ ${name} (${building} ห้อง ${room}) ลงทะเบียนผ่านอีเมล (รออนุมัติ)`, "ระบบ");
     
-    switchAuthMode('login');
-    document.getElementById("login-email-user").value = username;
-    document.getElementById("login-email-pass").value = userId;
+    renderAllViews();
 }
 
 function handleLineRegister(e) {
@@ -118,17 +123,55 @@ function handleLineRegister(e) {
         email: `${room}@line.me`,
         provider: "line",
         lineId: lineId,
-        role: "resident"
+        role: "resident",
+        status: "pending",
+        regDate: new Date().toISOString().slice(0,10)
     };
 
     users.push(newUser);
+    currentUser = null; // กำหนดให้ยังไม่เข้าสู่ระบบอัตโนมัติ
     saveData();
     updateRoomOptions();
 
-    currentUser = newUser;
     closeModal('modal-login');
-    showToast(`💬 ลงทะเบียนและเข้าสู่ระบบผ่าน LINE สำเร็จ! ต้อนรับ ${name}`, "success");
-    addAuditLog("USER_REGISTER", `ลงทะเบียนลูกห้องใหม่ ${name} (${building} ห้อง ${room}) ผ่าน LINE`, "LINE");
+    showToast(`💬 ลงทะเบียนผ่าน LINE เรียบร้อย! กรุณารอนิติบุคคลอนุมัติตัวตน และเข้าสู่ระบบใหม่อีกครั้ง`, "info");
+    addAuditLog("USER_REGISTER", `ลูกห้องใหม่ ${name} (${building} ห้อง ${room}) ลงทะเบียนผ่าน LINE (รออนุมัติ)`, "LINE");
+    renderAllViews();
+}
+
+function handleGuardRegister(e) {
+    e.preventDefault();
+    const username = document.getElementById("reg-guard-username").value.trim();
+    const pass = document.getElementById("reg-guard-pass").value.trim();
+    const name = document.getElementById("reg-guard-fullname").value.trim();
+
+    if (users.some(u => u.username === username || u.userId === username)) {
+        showToast("❌ ไอดีเจ้าหน้าที่นี้มีอยู่ในระบบแล้ว", "error");
+        return;
+    }
+
+    const newGuard = {
+        id: "GRD-" + Math.floor(1000 + Math.random() * 9000),
+        userId: username,
+        username: username,
+        passcode: pass,
+        name: name,
+        building: "ส่วนกลาง",
+        room: "GuardStation",
+        email: `${username}@condo-guard.com`,
+        provider: "email",
+        role: "guard",
+        status: "pending",
+        regDate: new Date().toISOString().slice(0,10)
+    };
+
+    users.push(newGuard);
+    currentUser = null; // กำหนดให้ยังไม่เข้าสู่ระบบอัตโนมัติ
+    saveData();
+
+    closeModal('modal-login');
+    showToast(`👮 ลงทะเบียนเจ้าหน้าที่สำเร็จ! กรุณารอนิติบุคคลอนุมัติตัวตน และเข้าสู่ระบบใหม่อีกครั้ง`, "info");
+    addAuditLog("USER_REGISTER", `เจ้าหน้าที่ รปภ. ใหม่ ${name} (${username}) ลงทะเบียน (รออนุมัติ)`, "ระบบ");
     renderAllViews();
 }
 
@@ -143,7 +186,17 @@ function handleEmailLogin(e) {
     );
 
     if (user) {
+        if (user.status === 'pending') {
+            showToast("⚠️ บัญชีของคุณอยู่ระหว่างรอนิติบุคคล/แอดมิน อนุมัติการใช้งาน", "error");
+            return;
+        }
+        if (user.status === 'rejected') {
+            showToast("❌ บัญชีของคุณไม่ได้รับการอนุมัติ กรุณาติดต่อนิติบุคคล", "error");
+            return;
+        }
+
         currentUser = user;
+        saveData();
         closeModal('modal-login');
         showToast(`🏠 เข้าสู่ระบบสำเร็จ! ต้อนรับ ${user.name} (${user.building} ห้อง ${user.room})`, "success");
         addAuditLog("USER_LOGIN", `ลูกห้อง ${user.name} เข้าสู่ระบบด้วยไอดี`, "อีเมล/ไอดี");
@@ -159,7 +212,17 @@ function handleLineLogin(e) {
     const user = users.find(u => u.id === selectedId || u.lineId === selectedId);
 
     if (user) {
+        if (user.status === 'pending') {
+            showToast("⚠️ บัญชี LINE นี้อยู่ระหว่างรอนิติบุคคล/แอดมิน อนุมัติ", "error");
+            return;
+        }
+        if (user.status === 'rejected') {
+            showToast("❌ บัญชี LINE นี้ไม่ได้รับการอนุมัติ กรุณาติดต่อนิติบุคคล", "error");
+            return;
+        }
+
         currentUser = user;
+        saveData();
         closeModal('modal-login');
         showToast(`💬 เข้าสู่ระบบผ่าน LINE สำเร็จ! ต้อนรับ ${user.name}`, "success");
         addAuditLog("USER_LOGIN", `ลูกห้อง ${user.name} เข้าสู่ระบบผ่าน LINE`, "LINE");
@@ -171,35 +234,94 @@ function handleLineLogin(e) {
 
 function handleGuardLogin(e) {
     e.preventDefault();
-    const pass = document.getElementById("login-guard-pass").value;
+    const username = document.getElementById("login-guard-user").value.trim();
+    const pass = document.getElementById("login-guard-pass").value.trim();
 
-    if (pass === '1234') {
-        currentUser = { role: 'guard', name: 'เจ้าหน้าที่ รปภ.', room: 'GuardStation', building: 'ส่วนกลาง' };
+    const user = users.find(u => u.role === 'guard' && (u.username === username || u.userId === username) && (u.passcode === pass || pass === '1234'));
+
+    if (user) {
+        if (user.status === 'pending') {
+            showToast("⚠️ บัญชีเจ้าหน้าที่นี้อยู่ระหว่างรอนิติบุคคลอนุมัติ", "error");
+            return;
+        }
+        if (user.status === 'rejected') {
+            showToast("❌ บัญชีเจ้าหน้าที่นี้ไม่ได้รับการอนุมัติ", "error");
+            return;
+        }
+
+        currentUser = user;
+        saveData();
         closeModal('modal-login');
-        showToast("👮 เข้าสู่ระบบสำเร็จในฐานะ เจ้าหน้าที่ รปภ.", "success");
-        addAuditLog("USER_LOGIN", `เจ้าหน้าที่ รปภ. เข้าสู่ระบบ`, "รปภ.");
+        showToast(`👮 เข้าสู่ระบบสำเร็จ! ต้อนรับ ${user.name}`, "success");
+        addAuditLog("USER_LOGIN", `เจ้าหน้าที่ ${user.name} เข้าสู่ระบบ`, "รปภ.");
         renderAllViews();
     } else {
-        showToast("❌ รหัสผ่านไม่ถูกต้อง (ลองใช้รหัส: 1234)", "error");
+        showToast("❌ ไม่พบไอดีเจ้าหน้าที่ หรือรหัสผ่านไม่ถูกต้อง", "error");
     }
 }
 
-function quickLogin(role) {
-    if (role === 'guard') {
-        currentUser = { role: 'guard', name: 'เจ้าหน้าที่ รปภ.', room: 'GuardStation', building: 'ส่วนกลาง' };
-    } else if (role === 'resident') {
-        currentUser = users.find(u => u.role === 'resident') || users[0];
-    } else if (role === 'admin') {
-        currentUser = { role: 'admin', name: 'ผู้ดูแลระบบ', room: 'Admin', building: 'ส่วนกลาง' };
+function handleAdminLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById("login-admin-user").value.trim();
+    const pass = document.getElementById("login-admin-pass").value.trim();
+
+    const adminUser = users.find(u => u.role === 'admin' && (u.username === username || u.userId === username) && (u.passcode === pass || pass === '1234'));
+
+    if (adminUser) {
+        currentUser = adminUser;
+        saveData();
+        closeModal('modal-login');
+        showToast("👑 เข้าสู่ระบบผู้ดูแลระบบ (นิติบุคคล) สำเร็จ!", "success");
+        addAuditLog("USER_LOGIN", `แอดมิน ${adminUser.name} เข้าสู่ระบบ`, "นิติบุคคล");
+        renderAllViews();
+    } else {
+        showToast("❌ รหัสผ่านแอดมินไม่ถูกต้อง (ลองไอดี: admin / รหัส: 1234)", "error");
+    }
+}
+
+function openChangePassModal() {
+    if (!currentUser) return;
+    document.getElementById("modal-change-pass").classList.remove("hidden");
+}
+
+function handleChangePassword(e) {
+    e.preventDefault();
+    const oldPass = document.getElementById("pass-old").value.trim();
+    const newPass = document.getElementById("pass-new").value.trim();
+    const confirmPass = document.getElementById("pass-confirm").value.trim();
+
+    if (oldPass !== currentUser.passcode && oldPass !== '1234') {
+        showToast("❌ รหัสผ่านปัจจุบันไม่ถูกต้อง", "error");
+        return;
     }
 
-    closeModal('modal-login');
-    showToast(`⚡ เข้าสู่ระบบแบบด่วน: ${currentUser.name}`, "info");
-    renderAllViews();
+    if (newPass.length < 4) {
+        showToast("❌ รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร", "error");
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        showToast("❌ รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน", "error");
+        return;
+    }
+
+    currentUser.passcode = newPass;
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx !== -1) users[idx].passcode = newPass;
+
+    saveData();
+    closeModal('modal-change-pass');
+    showToast("🔒 เปลี่ยนรหัสผ่านเรียบร้อยแล้ว!", "success");
+    addAuditLog("USER_CHANGE_PASS", `ผู้ใช้ ${currentUser.name} เปลี่ยนรหัสผ่านของตนเอง`, currentUser.role);
+
+    document.getElementById("pass-old").value = "";
+    document.getElementById("pass-new").value = "";
+    document.getElementById("pass-confirm").value = "";
 }
 
 function logout() {
-    currentUser = { role: 'guard', name: 'เจ้าหน้าที่ รปภ.', room: 'GuardStation', building: 'ส่วนกลาง' };
+    currentUser = null;
+    sessionStorage.removeItem("smart_current_user_v6");
     showToast("👋 ออกจากระบบเรียบร้อยแล้ว", "info");
     renderAllViews();
     openLoginModal();
