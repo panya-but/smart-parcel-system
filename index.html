@@ -472,143 +472,112 @@
 
     </main>
 
-    <!-- ป๊อปอัป 1: หน้าต่างเข้าสู่ระบบและสมัครสมาชิก -->
-    <div id="modal-login" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- ป๊อปอัป 1: หน้าต่างเข้าสู่ระบบและสมัครสมาชิก (ปรับปรุงใหม่) -->
+    <div id="modal-login" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 relative">
             <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- ปุ่มสลับโหมด (เข้าสู่ระบบ / สมัครสมาชิก) -->
-            <div class="flex items-center justify-center gap-2 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold">
-                <button id="btn-mode-login" onclick="switchAuthMode('login')" class="py-2 px-4 rounded-xl text-brand-600 bg-white shadow-sm font-bold border border-brand-200 transition-all">
-                    🔑 เข้าสู่ระบบ
-                </button>
-                <button id="btn-mode-register" onclick="switchAuthMode('register')" class="py-2 px-4 rounded-xl text-slate-500 font-semibold hover:text-slate-800 transition-all">
-                    📝 สมัครสมาชิกใหม่
-                </button>
-            </div>
-
             <!-- ================= ส่วนเข้าสู่ระบบ ================= -->
             <div id="auth-section-login" class="space-y-4">
                 <div class="text-center space-y-1">
-                    <h3 class="text-base font-bold text-slate-800">เข้าสู่ระบบจัดการพัสดุ</h3>
-                    <p class="text-xs text-slate-400">เลือกช่องทางการเข้าสู่ระบบตามบทบาท</p>
+                    <h3 class="text-lg font-bold text-slate-800">เข้าสู่ระบบจัดการพัสดุ</h3>
+                    <p class="text-xs text-slate-400">เลือกรูปแบบการเข้าสู่ระบบ</p>
                 </div>
 
-                <!-- แท็บเลือกประเภทการเข้าสู่ระบบ -->
-                <div class="grid grid-cols-4 gap-1 bg-slate-50 p-1 rounded-xl text-[11px]">
-                    <button onclick="switchLoginTab('email')" id="login-tab-email" class="py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
-                        📧 ลูกห้อง
+                <!-- แท็บเลือกรูปแบบเข้าสู่ระบบ (เข้าสู่ระบบทั่วไป / เข้าสู่ระบบด้วย LINE) -->
+                <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                    <button onclick="switchLoginTab('email')" id="login-tab-email" class="py-2 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
+                        🔑 เข้าสู่ระบบ
                     </button>
-                    <button onclick="switchLoginTab('line')" id="login-tab-line" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        💬 LINE
-                    </button>
-                    <button onclick="switchLoginTab('guard')" id="login-tab-guard" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        👮 รปภ.
-                    </button>
-                    <button onclick="switchLoginTab('admin')" id="login-tab-admin" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        👑 นิติบุคคล
+                    <button onclick="switchLoginTab('line')" id="login-tab-line" class="py-2 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                        💬 เข้าสู่ระบบด้วย LINE
                     </button>
                 </div>
 
-                <!-- ฟอร์มเข้าสู่ระบบ: ลูกห้อง (อีเมล/ไอดี) -->
-                <form id="login-form-email" onsubmit="handleEmailLogin(event)" class="space-y-3">
+                <!-- ฟอร์มเข้าสู่ระบบทั่วไป (รวมทุกบทบาท: ลูกห้อง, รปภ., นิติบุคคล) -->
+                <form id="login-form-email" onsubmit="handleGeneralLogin(event)" class="space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อผู้ใช้ / ไอดี / อีเมล <span class="text-red-500">*</span></label>
-                        <input type="text" id="login-email-user" placeholder="กรอกชื่อผู้ใช้ หรือรหัสผู้ใช้" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="login-email-user" placeholder="กรอกชื่อผู้ใช้ ไอดี หรืออีเมล" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผู้ใช้ / รหัสผ่าน <span class="text-red-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่าน <span class="text-red-500">*</span></label>
                         <input type="password" id="login-email-pass" placeholder="กรอกรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
-                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md shadow-brand-600/20 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบลูกห้อง
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-brand-600/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
                     </button>
                 </form>
 
-                <!-- ฟอร์มเข้าสู่ระบบ: LINE -->
+                <!-- ฟอร์มเข้าสู่ระบบด้วย LINE -->
                 <form id="login-form-line" onsubmit="handleLineLogin(event)" class="space-y-3 hidden">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกล็อกอินด้วยบัญชี LINE ที่อนุมัติแล้ว</label>
                         <select id="login-line-user-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-line-500">
-                            <!-- โหลดข้อมูลตัวเลือกด้วย JavaScript -->
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md shadow-line-500/20 transition-all flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-line-500/20 transition-all flex items-center justify-center gap-2">
                         <i class="fa-brands fa-line text-lg"></i> เข้าสู่ระบบผ่าน LINE
                     </button>
                 </form>
 
-                <!-- ฟอร์มเข้าสู่ระบบ: เจ้าหน้าที่ รปภ. -->
-                <form id="login-form-guard" onsubmit="handleGuardLogin(event)" class="space-y-3 hidden">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ใช้งานเจ้าหน้าที่ (รปภ.) <span class="text-red-500">*</span></label>
-                        <input type="text" id="login-guard-user" placeholder="เช่น guard01" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านเจ้าหน้าที่ <span class="text-red-500">*</span></label>
-                        <input type="password" id="login-guard-pass" placeholder="กรอกรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> เข้าสู่ระบบ รปภ.
+                <!-- แถบปุ่มล่างสุด: ลืมรหัสผ่าน (ซ้าย) / สมัครสมาชิก (ขวา) -->
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <button type="button" onclick="openForgotPassModal()" class="text-slate-500 hover:text-brand-600 font-medium transition-colors flex items-center gap-1">
+                        <i class="fa-solid fa-key text-amber-500"></i> ลืมรหัสผ่าน?
                     </button>
-                </form>
-
-                <!-- ฟอร์มเข้าสู่ระบบ: นิติบุคคล -->
-                <form id="login-form-admin" onsubmit="handleAdminLogin(event)" class="space-y-3 hidden">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ดูแลระบบ (นิติบุคคล) <span class="text-red-500">*</span></label>
-                        <input type="text" id="login-admin-user" value="admin" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านแอดมิน <span class="text-red-500">*</span></label>
-                        <input type="password" id="login-admin-pass" value="1234" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    </div>
-                    <button type="submit" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md">
-                        <i class="fa-solid fa-user-gear"></i> เข้าสู่ระบบ นิติบุคคล
+                    <button type="button" onclick="switchAuthMode('register')" class="text-brand-600 hover:text-brand-800 font-bold transition-colors flex items-center gap-1">
+                        <i class="fa-solid fa-user-plus"></i> ยังไม่ได้สมัครสมาชิก? ลงทะเบียน
                     </button>
-                </form>
+                </div>
             </div>
 
             <!-- ================= ส่วนสมัครสมาชิก ================= -->
             <div id="auth-section-register" class="space-y-4 hidden">
                 <div class="text-center space-y-1">
-                    <h3 class="text-base font-bold text-slate-800">สมัครสมาชิกใหม่</h3>
-                    <p class="text-xs text-slate-400">เลือกประเภทผู้สมัคร (นิติบุคคลจะเป็นผู้ยืนยันตัวตน)</p>
+                    <h3 class="text-lg font-bold text-slate-800">ลงทะเบียนสมัครสมาชิก</h3>
+                    <p class="text-xs text-slate-400">เลือกช่องทางการสมัคร (นิติบุคคลจะเป็นผู้ตรวจสอบและอนุมัติ)</p>
                 </div>
 
-                <!-- แท็บเลือกประเภทการสมัครสมาชิก -->
-                <div class="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl text-[11px]">
-                    <button onclick="switchRegisterTab('email')" id="reg-tab-email" class="py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
-                        📧 ลูกห้อง (อีเมล)
+                <!-- แท็บเลือกช่องทางสมัคร (สมัครด้วยเมล / สมัครด้วย LINE) -->
+                <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                    <button onclick="switchRegisterTab('email')" id="reg-tab-email" class="py-2 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
+                        📧 สมัครด้วยอีเมล
                     </button>
-                    <button onclick="switchRegisterTab('line')" id="reg-tab-line" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        💬 ลูกห้อง (LINE)
-                    </button>
-                    <button onclick="switchRegisterTab('guard')" id="reg-tab-guard" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        👮 เจ้าหน้าที่ รปภ.
+                    <button onclick="switchRegisterTab('line')" id="reg-tab-line" class="py-2 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                        💬 สมัครด้วย LINE
                     </button>
                 </div>
 
-                <!-- ฟอร์มสมัครสมาชิก: ลูกห้อง (อีเมล) -->
+                <!-- ฟอร์มสมัครด้วยอีเมล -->
                 <form id="register-form-email" onsubmit="handleEmailRegister(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทผู้สมัคร <span class="text-red-500">*</span></label>
+                        <select id="reg-email-role" onchange="toggleRegFields('email')" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="resident">🏠 ลูกห้อง (Resident)</option>
+                            <option value="guard">👮 เจ้าหน้าที่ รปภ. (Security Guard)</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อผู้ใช้ (Username) <span class="text-red-500">*</span></label>
                         <input type="text" id="reg-email-username" placeholder="เช่น somchai_condo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่าน <span class="text-red-500">*</span></label>
-                        <input type="password" id="reg-email-userid" placeholder="ตั้งรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ตั้งรหัสผ่าน <span class="text-red-500">*</span></label>
+                        <input type="password" id="reg-email-pass" placeholder="ตั้งรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
                         <input type="text" id="reg-email-fullname" placeholder="เช่น นายสมชาย ใจดี" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+
+                    <!-- ฟิลด์เฉพาะลูกห้อง (ซ่อนอัตโนมัติหากเลือก รปภ.) -->
+                    <div id="reg-email-resident-fields" class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">ตึก / อาคาร <span class="text-red-500">*</span></label>
-                            <select id="reg-email-building" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <select id="reg-email-building" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                                 <option value="ตึก A">ตึก A</option>
                                 <option value="ตึก B">ตึก B</option>
                                 <option value="ตึก C">ตึก C</option>
@@ -616,19 +585,20 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">เลขห้อง <span class="text-red-500">*</span></label>
-                            <input type="text" id="reg-email-room" placeholder="เช่น 501" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <input type="text" id="reg-email-room" placeholder="เช่น 501" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">อีเมล <span class="text-red-500">*</span></label>
                         <input type="email" id="reg-email-email" placeholder="example@email.com" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
-                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all">
-                        ✨ ส่งคำขอสมัครลูกห้อง (รอนิติอนุมัติ)
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all">
+                        ✨ ส่งคำขอสมัครสมาชิก (รอนิติอนุมัติ)
                     </button>
                 </form>
 
-                <!-- ฟอร์มสมัครสมาชิก: ลูกห้อง (LINE) -->
+                <!-- ฟอร์มสมัครด้วย LINE -->
                 <form id="register-form-line" onsubmit="handleLineRegister(event)" class="space-y-3 hidden">
                     <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-1">
                         <i class="fa-brands fa-line text-2xl text-line-500"></i>
@@ -636,13 +606,22 @@
                         <p class="text-[10px] text-emerald-700">กรอกข้อมูลเพื่อส่งให้นิติบุคคลยืนยันตัวตนก่อนเปิดใช้งาน</p>
                     </div>
                     <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทผู้สมัคร <span class="text-red-500">*</span></label>
+                        <select id="reg-line-role" onchange="toggleRegFields('line')" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-line-500 focus:outline-none">
+                            <option value="resident">🏠 ลูกห้อง (Resident)</option>
+                            <option value="guard">👮 เจ้าหน้าที่ รปภ. (Security Guard)</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
                         <input type="text" id="reg-line-fullname" placeholder="เช่น คุณณัฐพล พร้อมพงษ์" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-line-500 focus:outline-none">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+
+                    <!-- ฟิลด์เฉพาะลูกห้องสำหรับ LINE -->
+                    <div id="reg-line-resident-fields" class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">ตึก / อาคาร <span class="text-red-500">*</span></label>
-                            <select id="reg-line-building" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2 py-1.5 text-xs focus:ring-2 focus:ring-line-500 focus:outline-none">
+                            <select id="reg-line-building" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2 py-1.5 text-xs focus:ring-2 focus:ring-line-500 focus:outline-none">
                                 <option value="ตึก A">ตึก A</option>
                                 <option value="ตึก B">ตึก B</option>
                                 <option value="ตึก C">ตึก C</option>
@@ -650,38 +629,47 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">เลขห้อง <span class="text-red-500">*</span></label>
-                            <input type="text" id="reg-line-room" placeholder="เช่น 201" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-line-500 focus:outline-none">
+                            <input type="text" id="reg-line-room" placeholder="เช่น 201" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-line-500 focus:outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
+
+                    <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
                         <i class="fa-brands fa-line text-base"></i> ส่งคำขอสมัครผ่าน LINE (รอนิติอนุมัติ)
                     </button>
                 </form>
 
-                <!-- ฟอร์มสมัครสมาชิก: เจ้าหน้าที่ รปภ. ใหม่ -->
-                <form id="register-form-guard" onsubmit="handleGuardRegister(event)" class="space-y-3 hidden">
-                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center space-y-1">
-                        <i class="fa-solid fa-user-shield text-2xl text-amber-600"></i>
-                        <p class="text-xs font-bold text-amber-900">ลงทะเบียนเจ้าหน้าที่ รปภ. ใหม่</p>
-                        <p class="text-[10px] text-amber-700">คำขอจะถูกส่งไปยังนิติบุคคลเพื่ออนุมัติสิทธิ์เข้าใช้งาน</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ใช้งาน (Username) <span class="text-red-500">*</span></label>
-                        <input type="text" id="reg-guard-username" placeholder="เช่น guard_02" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ตั้งรหัสผ่าน <span class="text-red-500">*</span></label>
-                        <input type="password" id="reg-guard-pass" placeholder="ตั้งรหัสผ่านประจำตัว" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล เจ้าหน้าที่ <span class="text-red-500">*</span></label>
-                        <input type="text" id="reg-guard-fullname" placeholder="เช่น นายวิชัย รักษ์ความปลอดภัย" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-paper-plane text-xs"></i> ส่งคำขอสมัครเจ้าหน้าที่ (รอนิติอนุมัติ)
+                <!-- ปุ่มกลับหน้าเข้าสู่ระบบ -->
+                <div class="pt-2 border-t border-slate-100 text-center">
+                    <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-500 hover:text-brand-600 font-semibold transition-colors">
+                        ← มีบัญชีอยู่แล้ว? กลับไปหน้าเข้าสู่ระบบ
                     </button>
-                </form>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ป๊อปอัป: ลืมรหัสผ่าน -->
+    <div id="modal-forgot-pass" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative">
+            <button onclick="closeModal('modal-forgot-pass')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-lg font-bold">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800">แจ้งลืมรหัสผ่าน</h3>
+                <p class="text-xs text-slate-400">กรอกไอดีหรืออีเมล เพื่อส่งคำขอรีเซ็ตรหัสผ่านไปยังนิติบุคคล</p>
+            </div>
+            <form onsubmit="handleForgotPassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ใช้ / อีเมล <span class="text-red-500">*</span></label>
+                    <input type="text" id="forgot-user-input" required placeholder="กรอกไอดีผู้ใช้งาน หรืออีเมล" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all">
+                    📩 ส่งคำขอรีเซ็ตรหัสผ่านให้นิติบุคคล
+                </button>
+            </form>
         </div>
     </div>
 
