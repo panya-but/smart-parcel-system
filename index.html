@@ -7,16 +7,16 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icon CDN -->
+    <!-- ไอคอน FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- QRCode JS CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Kanit Font -->
+    <!-- ฟอนต์ Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <!-- ไฟล์ CSS ตกแต่งเพิ่มเติม -->
     <link rel="stylesheet" href="css/styles.css">
 
     <script>
@@ -35,11 +35,11 @@
 </head>
 <body class="h-full text-slate-800 flex flex-col bg-slate-50 antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- TOP HEADER BAR & AUTH STATUS -->
+    <!-- แถบส่วนหัวด้านบนและสถานะสิทธิ์การใช้งาน -->
     <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
+                <!-- โลโก้ -->
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-blue-400 flex items-center justify-center shadow-lg shadow-brand-500/30">
                         <i class="fa-solid fa-box-archive text-white text-lg"></i>
@@ -47,36 +47,44 @@
                     <div>
                         <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
                             ระบบจัดการพัสดุอัจฉริยะ
-                            <span class="text-[10px] font-normal px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">Auth & LINE Edition</span>
+                            <span class="text-[10px] font-normal px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">Admin Verification Required</span>
                         </h1>
-                        <p class="text-[11px] text-slate-400 hidden sm:block">Smart Parcel System with Registered LINE/Email Auth & Data Isolation</p>
+                        <p class="text-[11px] text-slate-400 hidden sm:block">Smart Parcel System with Admin Verification & User Management</p>
                     </div>
                 </div>
 
-                <!-- User Profile & Auth Controls -->
+                <!-- ข้อมูลผู้ใช้งานและปุ่มควบคุมการใช้งาน -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <div id="user-profile-badge" class="flex items-center gap-2.5 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
+                    <div id="user-profile-badge" class="hidden flex items-center gap-2.5 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
                         <div id="user-role-avatar" class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold">G</div>
                         <div class="text-left hidden sm:block">
-                            <p id="user-display-name" class="text-xs font-semibold text-white">เจ้าหน้าที่ รปภ.</p>
-                            <p id="user-display-role" class="text-[10px] text-slate-400">บทบาท: Security Guard</p>
+                            <p id="user-display-name" class="text-xs font-semibold text-white">ผู้ใช้งาน</p>
+                            <p id="user-display-role" class="text-[10px] text-slate-400">บทบาท</p>
                         </div>
                     </div>
 
-                    <button onclick="openLoginModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                        <span>เข้าสู่ระบบ / ลงทะเบียน</span>
+                    <button id="btn-header-change-pass" onclick="openChangePassModal()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all" title="เปลี่ยนรหัสผ่าน">
+                        <i class="fa-solid fa-key text-amber-400"></i>
+                        <span class="hidden sm:inline">เปลี่ยนรหัส</span>
                     </button>
 
-                    <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1 transition-all" title="ออกจากระบบ">
-                        <i class="fa-solid fa-arrow-right-from-bracket text-red-400"></i>
+                    <!-- ปุ่มเข้าสู่ระบบ (แสดงเมื่อยังไม่ได้เข้าสู่ระบบ) -->
+                    <button id="btn-header-login" onclick="openLoginModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>เข้าสู่ระบบ / สมัครสมาชิก</span>
+                    </button>
+
+                    <!-- ปุ่มออกจากระบบ (แสดงเมื่อเข้าสู่ระบบแล้ว) -->
+                    <button id="btn-header-logout" onclick="logout()" class="hidden bg-red-600/90 hover:bg-red-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all" title="ออกจากระบบ">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>ออกจากระบบ</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- LINE SIMULATION BANNER STRIP -->
+    <!-- แถบจำลองการส่งแจ้งเตือนผ่าน LINE -->
     <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 text-white border-b border-emerald-900/40 text-xs py-2 px-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2">
@@ -91,14 +99,41 @@
         </div>
     </div>
 
-    <!-- TOAST & LINE POPUP CONTAINER -->
+    <!-- กล่องแสดงการแจ้งเตือน Toast และป๊อปอัป LINE -->
     <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
-    <!-- MAIN CONTENT AREA -->
+    <!-- พื้นที่แสดงเนื้อหาหลัก -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- 1. GUARD VIEW -->
-        <div id="view-guard" class="view-panel space-y-6">
+        <!-- 0. หน้าแรกสำหรับผู้เยี่ยมชม / ผู้ใช้ที่รอการอนุมัติ -->
+        <div id="view-guest" class="view-panel max-w-2xl mx-auto my-12 text-center space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-xl space-y-5">
+                <div class="w-20 h-20 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ยินดีต้อนรับสู่ระบบจัดการพัสดุอัจฉริยะ</h2>
+                    <p class="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+                        กรุณา **เข้าสู่ระบบ** เพื่อเข้าใช้งานแผงควบคุมระบบพัสดุ<br>
+                        *(หากเพิ่งสมัครสมาชิกใหม่ โปรดรอนิติบุคคลอนุมัติตัวตนก่อนเข้าสู่ระบบ)*
+                    </p>
+                </div>
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onclick="openLoginModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-6 py-3 rounded-2xl shadow-lg shadow-brand-600/30 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket text-sm"></i> เข้าสู่ระบบ / สมัครสมาชิก
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 bg-purple-50 border border-purple-200 rounded-2xl text-left space-y-1 max-w-md mx-auto text-xs text-purple-900">
+                <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-purple-600"></i> บัญชีทดลองเข้าใช้งาน (อนุมัติแล้ว):</p>
+                <p>• <strong>นิติบุคคล (Admin):</strong> ไอดี <code>admin</code> | รหัสผ่าน <code>1234</code></p>
+                <p>• <strong>เจ้าหน้าที่ รปภ.:</strong> ไอดี <code>guard01</code> | รหัสผ่าน <code>1234</code></p>
+                <p>• <strong>ลูกห้อง (ตึก A ห้อง 101):</strong> ไอดี <code>1001</code> | รหัสผ่าน <code>1234</code></p>
+            </div>
+        </div>
+
+        <!-- 1. หน้าแผงควบคุมสำหรับเจ้าหน้าที่ รปภ. -->
+        <div id="view-guard" class="view-panel hidden space-y-6">
             <div id="guard-cancel-alert-banner" class="hidden alert-pulse border-2 border-red-500 rounded-2xl p-4 sm:p-5 text-red-900 shadow-xl transition-all">
                 <div class="flex items-start gap-4">
                     <div class="p-3 bg-red-600 text-white rounded-xl flex-shrink-0 animate-bounce">
@@ -144,7 +179,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- INTAKE FORM -->
+                <!-- ฟอร์มบันทึกรับพัสดุเข้า -->
                 <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
@@ -164,7 +199,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">เลขห้อง (เฉพาะที่ลงทะเบียน) <span class="text-red-500">*</span></label>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">เลขห้อง (เฉพาะที่อนุมัติแล้ว) <span class="text-red-500">*</span></label>
                                     <select id="intake-room" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
                                 </div>
                             </div>
@@ -211,7 +246,7 @@
                     </div>
                 </div>
 
-                <!-- PENDING PARCELS LIST -->
+                <!-- รายการตารางพัสดุรอส่งมอบ -->
                 <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
                         <div>
@@ -254,7 +289,7 @@
             </div>
         </div>
 
-        <!-- 2. RESIDENT VIEW -->
+        <!-- 2. หน้าแผงควบคุมสำหรับลูกห้อง -->
         <div id="view-resident" class="view-panel hidden space-y-6">
             <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
@@ -264,14 +299,11 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 id="resident-room-title" class="text-lg font-bold text-slate-800">ตึก A - ห้อง 101</h2>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">เข้าสู่ระบบแล้ว</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">ยืนยันตัวตนแล้ว</span>
                         </div>
                         <p id="resident-name-title" class="text-xs text-slate-500">เจ้าของห้อง: คุณสมชาย ใจดี</p>
                     </div>
                 </div>
-                <button onclick="openLoginModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-right-arrows"></i> สลับไอดี / ลงทะเบียนเพิ่ม
-                </button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -310,19 +342,34 @@
             </div>
         </div>
 
-        <!-- 3. ADMIN VIEW -->
+        <!-- 3. หน้าแผงควบคุมสำหรับนิติบุคคล / ผู้ดูแลระบบ -->
         <div id="view-admin" class="view-panel hidden space-y-6">
+            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/30 border border-purple-400/40 text-purple-200 flex items-center justify-center font-bold text-xl">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            แผงควบคุมนิติบุคคล (Admin Control Center)
+                        </h2>
+                        <p class="text-xs text-purple-200">จัดการอนุมัติสมาชิกใหม่, ลบข้อมูลผู้ย้ายออก และควบคุมระบบพัสดุส่วนกลาง</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ส่วนแสดงสถิติรวม -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500">พัสดุรวมทั้งหมด</span>
+                    <span class="text-xs font-semibold text-slate-500">สมัครใหม่รออนุมัติ</span>
+                    <p id="stat-pending-users-count" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-500">พัสดุรวมในระบบ</span>
                     <p id="stat-admin-total" class="text-2xl font-bold text-slate-800 mt-1">0</p>
                 </div>
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500">รอส่งมอบ</span>
-                    <p id="stat-admin-pending" class="text-2xl font-bold text-amber-600 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500">รับเรียบร้อยแล้ว</span>
+                    <span class="text-xs font-semibold text-slate-500">พัสดุรับแล้ว</span>
                     <p id="stat-admin-completed" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
                 </div>
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
@@ -331,26 +378,60 @@
                 </div>
             </div>
 
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 mt-0.5"><i class="fa-solid fa-user-shield"></i></div>
-                    <div>
-                        <h4 class="text-xs font-bold text-amber-900 flex items-center gap-2">
-                            นโยบายคุ้มครองข้อมูลส่วนบุคคล (30-Day Photo Retention Policy)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-200 text-amber-800 font-semibold">PDPA</span>
-                        </h4>
-                        <p class="text-[11px] text-amber-700 mt-0.5">ระบบจะลบไฟล์รูปถ่ายพัสดุที่มีอายุเกิน 30 วันโดยอัตโนมัติ เพื่อคุ้มครองข้อมูลส่วนบุคคลหน้ากล่องและประหยัดพื้นที่</p>
-                    </div>
+            <!-- ส่วนที่ A: คำขอสมัครสมาชิกที่รอการอนุมัติตัวตน -->
+            <div class="bg-white rounded-2xl border border-amber-200 p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-amber-100 pb-3">
+                    <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2">
+                        <i class="fa-solid fa-user-clock text-amber-600"></i> คำขอสมัครสมาชิกที่รออนุมัติตัวตน (Pending Approvals)
+                    </h3>
+                    <span class="text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 font-semibold">นิติบุคคลเป็นผู้ยืนยัน</span>
                 </div>
-                <button type="button" onclick="triggerManualCleanup()" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm flex-shrink-0">
-                    <i class="fa-solid fa-broom"></i> <span>สแกนและล้างรูปภาพเก่าทันที</span>
-                </button>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-amber-50/80 text-amber-900 uppercase text-[11px] font-bold border-b border-amber-200">
+                            <tr>
+                                <th class="px-3 py-3">ชื่อ-นามสกุล / ไอดี</th>
+                                <th class="px-3 py-3">ประเภท / สถานที่</th>
+                                <th class="px-3 py-3">ช่องทางสมัคร</th>
+                                <th class="px-3 py-3 text-center">สถานะ</th>
+                                <th class="px-3 py-3 text-right">การอนุมัติ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-pending-users-tbody" class="divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
+                </div>
             </div>
 
+            <!-- ส่วนที่ B: จัดการรายชื่อผู้ใช้งานทั้งหมดและลบไอดีผู้ย้ายออก -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <h3 class="text-sm font-bold text-slate-800">คลังข้อมูลพัสดุระบบหลัก (Master Database)</h3>
-                    <input type="text" id="admin-search-input" onkeyup="renderAdminTable()" placeholder="ค้นหาห้อง, รหัส..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear text-brand-600"></i> จัดการรายชื่อผู้ใช้งานทั้งหมด & ลบไอดีผู้ย้ายออก
+                    </h3>
+                    <input type="text" id="admin-user-search-input" onkeyup="renderUserManagementTable()" placeholder="ค้นหาชื่อ, ห้อง, ไอดี..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase text-[11px] font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="px-3 py-3">ผู้ใช้งาน</th>
+                                <th class="px-3 py-3">ตึก - ห้อง</th>
+                                <th class="px-3 py-3">บทบาท</th>
+                                <th class="px-3 py-3 text-center">สถานะสิทธิ์</th>
+                                <th class="px-3 py-3">วันที่สมัคร</th>
+                                <th class="px-3 py-3 text-right">จัดการผู้ย้ายออก</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-users-tbody" class="divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ส่วนที่ C: คลังข้อมูลพัสดุระบบหลัก -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-database text-brand-600"></i> คลังข้อมูลพัสดุระบบหลัก (Master Database)</h3>
+                    <input type="text" id="admin-search-input" onkeyup="renderAdminTable()" placeholder="ค้นหาห้อง, รหัสพัสดุ..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-200">
                     <table class="w-full text-left text-xs text-slate-600">
@@ -369,52 +450,69 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
-                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand-600"></i> ประวัติกิจกรรมทั้งหมด (Audit Logs)</h3>
-                <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="audit-logs-container"></div>
+            <!-- ส่วนที่ D: ประวัติการทำงานและนโยบายลบข้อมูลเก่า -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand-600"></i> ประวัติกิจกรรมทั้งหมด (Audit Logs)</h3>
+                    <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="audit-logs-container"></div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm space-y-3 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-bold text-amber-900 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-cat text-amber-600 text-base"></i> PDPA Photo Retention Policy
+                        </h4>
+                        <p class="text-[11px] text-amber-800 leading-relaxed">ระบบจะลบรูปถ่ายพัสดุที่อายุเกิน 30 วันโดยอัตโนมัติ เพื่อคุ้มครองความเป็นส่วนตัวและลดพื้นที่จัดเก็บ</p>
+                    </div>
+                    <button type="button" onclick="triggerManualCleanup()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-broom"></i> สแกนล้างรูปภาพเก่าทันที
+                    </button>
+                </div>
             </div>
         </div>
 
     </main>
 
-    <!-- MODAL 1: AUTHENTICATION & REGISTRATION MODAL -->
+    <!-- ป๊อปอัป 1: หน้าต่างเข้าสู่ระบบและสมัครสมาชิก -->
     <div id="modal-login" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 relative">
             <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- Mode Selector Header (เข้าสู่ระบบ / ลงทะเบียน) -->
+            <!-- ปุ่มสลับโหมด (เข้าสู่ระบบ / สมัครสมาชิก) -->
             <div class="flex items-center justify-center gap-2 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold">
                 <button id="btn-mode-login" onclick="switchAuthMode('login')" class="py-2 px-4 rounded-xl text-brand-600 bg-white shadow-sm font-bold border border-brand-200 transition-all">
                     🔑 เข้าสู่ระบบ
                 </button>
                 <button id="btn-mode-register" onclick="switchAuthMode('register')" class="py-2 px-4 rounded-xl text-slate-500 font-semibold hover:text-slate-800 transition-all">
-                    📝 ลงทะเบียนลูกห้องใหม่
+                    📝 สมัครสมาชิกใหม่
                 </button>
             </div>
 
-            <!-- ================= AUTH SECTION: LOGIN ================= -->
+            <!-- ================= ส่วนเข้าสู่ระบบ ================= -->
             <div id="auth-section-login" class="space-y-4">
                 <div class="text-center space-y-1">
                     <h3 class="text-base font-bold text-slate-800">เข้าสู่ระบบจัดการพัสดุ</h3>
-                    <p class="text-xs text-slate-400">เลือกช่องทางการเข้าสู่ระบบ</p>
+                    <p class="text-xs text-slate-400">เลือกช่องทางการเข้าสู่ระบบตามบทบาท</p>
                 </div>
 
-                <!-- Login Type Tabs -->
-                <div class="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl text-xs">
+                <!-- แท็บเลือกประเภทการเข้าสู่ระบบ -->
+                <div class="grid grid-cols-4 gap-1 bg-slate-50 p-1 rounded-xl text-[11px]">
                     <button onclick="switchLoginTab('email')" id="login-tab-email" class="py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
-                        📧 ไอดี/อีเมล
+                        📧 ลูกห้อง
                     </button>
                     <button onclick="switchLoginTab('line')" id="login-tab-line" class="py-1.5 rounded-lg text-slate-500 transition-all">
                         💬 LINE
                     </button>
                     <button onclick="switchLoginTab('guard')" id="login-tab-guard" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        👮 เจ้าหน้าที่
+                        👮 รปภ.
+                    </button>
+                    <button onclick="switchLoginTab('admin')" id="login-tab-admin" class="py-1.5 rounded-lg text-slate-500 transition-all">
+                        👑 นิติบุคคล
                     </button>
                 </div>
 
-                <!-- LOGIN FORM: EMAIL/ID -->
+                <!-- ฟอร์มเข้าสู่ระบบ: ลูกห้อง (อีเมล/ไอดี) -->
                 <form id="login-form-email" onsubmit="handleEmailLogin(event)" class="space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อผู้ใช้ / ไอดี / อีเมล <span class="text-red-500">*</span></label>
@@ -422,19 +520,19 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผู้ใช้ / รหัสผ่าน <span class="text-red-500">*</span></label>
-                        <input type="password" id="login-email-pass" placeholder="กรอกรหัสผู้ใช้" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="password" id="login-email-pass" placeholder="กรอกรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md shadow-brand-600/20 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบด้วยไอดี
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบลูกห้อง
                     </button>
                 </form>
 
-                <!-- LOGIN FORM: LINE -->
+                <!-- ฟอร์มเข้าสู่ระบบ: LINE -->
                 <form id="login-form-line" onsubmit="handleLineLogin(event)" class="space-y-3 hidden">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกล็อกอินด้วยบัญชี LINE ที่ลงทะเบียนไว้</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกล็อกอินด้วยบัญชี LINE ที่อนุมัติแล้ว</label>
                         <select id="login-line-user-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-line-500">
-                            <!-- Populated dynamically -->
+                            <!-- โหลดข้อมูลตัวเลือกด้วย JavaScript -->
                         </select>
                     </div>
                     <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md shadow-line-500/20 transition-all flex items-center justify-center gap-2">
@@ -442,44 +540,66 @@
                     </button>
                 </form>
 
-                <!-- LOGIN FORM: GUARD -->
+                <!-- ฟอร์มเข้าสู่ระบบ: เจ้าหน้าที่ รปภ. -->
                 <form id="login-form-guard" onsubmit="handleGuardLogin(event)" class="space-y-3 hidden">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านเจ้าหน้าที่ รปภ.</label>
-                        <input type="password" id="login-guard-pass" value="1234" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ใช้งานเจ้าหน้าที่ (รปภ.) <span class="text-red-500">*</span></label>
+                        <input type="text" id="login-guard-user" placeholder="เช่น guard01" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านเจ้าหน้าที่ <span class="text-red-500">*</span></label>
+                        <input type="password" id="login-guard-pass" placeholder="กรอกรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-user-shield"></i> เข้าสู่ระบบ รปภ.
                     </button>
                 </form>
+
+                <!-- ฟอร์มเข้าสู่ระบบ: นิติบุคคล -->
+                <form id="login-form-admin" onsubmit="handleAdminLogin(event)" class="space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ดูแลระบบ (นิติบุคคล) <span class="text-red-500">*</span></label>
+                        <input type="text" id="login-admin-user" value="admin" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านแอดมิน <span class="text-red-500">*</span></label>
+                        <input type="password" id="login-admin-pass" value="1234" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <button type="submit" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-user-gear"></i> เข้าสู่ระบบ นิติบุคคล
+                    </button>
+                </form>
             </div>
 
-            <!-- ================= AUTH SECTION: REGISTER ================= -->
+            <!-- ================= ส่วนสมัครสมาชิก ================= -->
             <div id="auth-section-register" class="space-y-4 hidden">
                 <div class="text-center space-y-1">
-                    <h3 class="text-base font-bold text-slate-800">ลงทะเบียนสมาชิกใหม่</h3>
-                    <p class="text-xs text-slate-400">เลือกช่องทางลงทะเบียนเข้าใช้งานระบบ</p>
+                    <h3 class="text-base font-bold text-slate-800">สมัครสมาชิกใหม่</h3>
+                    <p class="text-xs text-slate-400">เลือกประเภทผู้สมัคร (นิติบุคคลจะเป็นผู้ยืนยันตัวตน)</p>
                 </div>
 
-                <!-- Register Type Tabs -->
-                <div class="grid grid-cols-2 gap-1 bg-slate-50 p-1 rounded-xl text-xs">
+                <!-- แท็บเลือกประเภทการสมัครสมาชิก -->
+                <div class="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl text-[11px]">
                     <button onclick="switchRegisterTab('email')" id="reg-tab-email" class="py-1.5 rounded-lg text-brand-600 bg-white shadow-sm font-bold transition-all">
-                        📧 ลงทะเบียนด้วยอีเมล
+                        📧 ลูกห้อง (อีเมล)
                     </button>
                     <button onclick="switchRegisterTab('line')" id="reg-tab-line" class="py-1.5 rounded-lg text-slate-500 transition-all">
-                        💬 ลงทะเบียนด้วย LINE
+                        💬 ลูกห้อง (LINE)
+                    </button>
+                    <button onclick="switchRegisterTab('guard')" id="reg-tab-guard" class="py-1.5 rounded-lg text-slate-500 transition-all">
+                        👮 เจ้าหน้าที่ รปภ.
                     </button>
                 </div>
 
-                <!-- REGISTER FORM: EMAIL -->
+                <!-- ฟอร์มสมัครสมาชิก: ลูกห้อง (อีเมล) -->
                 <form id="register-form-email" onsubmit="handleEmailRegister(event)" class="space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อผู้ใช้ (Username) <span class="text-red-500">*</span></label>
                         <input type="text" id="reg-email-username" placeholder="เช่น somchai_condo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผู้ใช้ / รหัสผ่าน <span class="text-red-500">*</span></label>
-                        <input type="password" id="reg-email-userid" placeholder="ตั้งรหัสผ่าน หรือ Passcode" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่าน <span class="text-red-500">*</span></label>
+                        <input type="password" id="reg-email-userid" placeholder="ตั้งรหัสผ่าน" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
@@ -504,16 +624,16 @@
                         <input type="email" id="reg-email-email" placeholder="example@email.com" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
                     <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all">
-                        ✨ ยืนยันการลงทะเบียนด้วยอีเมล
+                        ✨ ส่งคำขอสมัครลูกห้อง (รอนิติอนุมัติ)
                     </button>
                 </form>
 
-                <!-- REGISTER FORM: LINE -->
+                <!-- ฟอร์มสมัครสมาชิก: ลูกห้อง (LINE) -->
                 <form id="register-form-line" onsubmit="handleLineRegister(event)" class="space-y-3 hidden">
                     <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-1">
                         <i class="fa-brands fa-line text-2xl text-line-500"></i>
-                        <p class="text-xs font-bold text-emerald-900">ลงทะเบียนด่วนผ่าน LINE</p>
-                        <p class="text-[10px] text-emerald-700">กรอกเพียงชื่อและเลขห้องเพื่อเชื่อมโยงบัญชี LINE ทันที</p>
+                        <p class="text-xs font-bold text-emerald-900">สมัครสมาชิกผ่าน LINE</p>
+                        <p class="text-[10px] text-emerald-700">กรอกข้อมูลเพื่อส่งให้นิติบุคคลยืนยันตัวตนก่อนเปิดใช้งาน</p>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
@@ -534,23 +654,71 @@
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-line-500 hover:bg-line-600 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-brands fa-line text-base"></i> ยืนยันการลงทะเบียนด้วย LINE
+                        <i class="fa-brands fa-line text-base"></i> ส่งคำขอสมัครผ่าน LINE (รอนิติอนุมัติ)
                     </button>
                 </form>
-            </div>
 
-            <!-- Demo Shortcuts -->
-            <div class="border-t border-slate-100 pt-3 text-center space-y-2">
-                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">หรือคลิกปุ่มทางลัดทดลองใช้งาน (Quick Demo)</p>
-                <div class="flex items-center justify-center gap-1.5">
-                    <button type="button" onclick="quickLogin('guard')" class="px-2.5 py-1 text-[11px] bg-brand-50 text-brand-700 font-semibold rounded-lg border border-brand-200">⚡ เข้าเป็น รปภ.</button>
-                    <button type="button" onclick="quickLogin('resident')" class="px-2.5 py-1 text-[11px] bg-amber-50 text-amber-700 font-semibold rounded-lg border border-amber-200">⚡ เข้าเป็น ลูกห้อง (A-101)</button>
-                </div>
+                <!-- ฟอร์มสมัครสมาชิก: เจ้าหน้าที่ รปภ. ใหม่ -->
+                <form id="register-form-guard" onsubmit="handleGuardRegister(event)" class="space-y-3 hidden">
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center space-y-1">
+                        <i class="fa-solid fa-user-shield text-2xl text-amber-600"></i>
+                        <p class="text-xs font-bold text-amber-900">ลงทะเบียนเจ้าหน้าที่ รปภ. ใหม่</p>
+                        <p class="text-[10px] text-amber-700">คำขอจะถูกส่งไปยังนิติบุคคลเพื่ออนุมัติสิทธิ์เข้าใช้งาน</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ไอดีผู้ใช้งาน (Username) <span class="text-red-500">*</span></label>
+                        <input type="text" id="reg-guard-username" placeholder="เช่น guard_02" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ตั้งรหัสผ่าน <span class="text-red-500">*</span></label>
+                        <input type="password" id="reg-guard-pass" placeholder="ตั้งรหัสผ่านประจำตัว" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล เจ้าหน้าที่ <span class="text-red-500">*</span></label>
+                        <input type="text" id="reg-guard-fullname" placeholder="เช่น นายวิชัย รักษ์ความปลอดภัย" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane text-xs"></i> ส่งคำขอสมัครเจ้าหน้าที่ (รอนิติอนุมัติ)
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: IMAGE ZOOM -->
+    <!-- ป๊อปอัป: เปลี่ยนรหัสผ่าน -->
+    <div id="modal-change-pass" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative">
+            <button onclick="closeModal('modal-change-pass')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-lg font-bold">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800">เปลี่ยนรหัสผ่านประจำตัว</h3>
+                <p class="text-xs text-slate-400">สำหรับลูกห้องและเจ้าหน้าที่ รปภ.</p>
+            </div>
+            <form onsubmit="handleChangePassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านปัจจุบัน <span class="text-red-500">*</span></label>
+                    <input type="password" id="pass-old" required placeholder="กรอกรหัสผ่านปัจจุบัน" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่านใหม่ <span class="text-red-500">*</span></label>
+                    <input type="password" id="pass-new" required placeholder="ตั้งรหัสผ่านใหม่" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ยืนยันรหัสผ่านใหม่ <span class="text-red-500">*</span></label>
+                    <input type="password" id="pass-confirm" required placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md transition-all">
+                    🔒 บันทึกเปลี่ยนรหัสผ่าน
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ป๊อปอัป 2: ขยายดูรูปถ่ายพัสดุ -->
     <div id="modal-image-zoom" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-4 space-y-3 shadow-2xl relative">
             <button onclick="closeModal('modal-image-zoom')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -562,7 +730,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: RESIDENT QR -->
+    <!-- ป๊อปอัป 3: QR Code รับพัสดุรวมสำหรับลูกห้อง -->
     <div id="modal-resident-qr" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
             <button onclick="closeModal('modal-resident-qr')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -575,7 +743,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: SCANNER -->
+    <!-- ป๊อปอัป 4: กล้องสแกน QR Code สำหรับ รปภ. -->
     <div id="modal-guard-scanner" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
             <button onclick="closeModal('modal-guard-scanner')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -595,7 +763,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT SCRIPTS LOAD ORDER -->
+    <!-- ลำดับการโหลดไฟล์ JavaScript -->
     <script src="js/state.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/ui.js"></script>
