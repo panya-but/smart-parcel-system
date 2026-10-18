@@ -1,13 +1,13 @@
 function updateRoomOptions() {
-    const building = document.getElementById("intake-building").value;
+    const building = document.getElementById("intake-building")?.value;
     const select = document.getElementById("intake-room");
-    if (!select) return;
+    if (!select || !building) return;
 
-    // ดึงเฉพาะห้องพักที่ลงทะเบียนไว้แล้วของตึกนั้นๆ
-    const filteredUsers = users.filter(u => u.building === building && u.role === 'resident');
+    // แสดงเฉพาะเลขห้องของลูกห้องที่ผ่านการอนุมัติแล้ว
+    const filteredUsers = users.filter(u => u.building === building && u.role === 'resident' && u.status === 'approved');
     
     if (filteredUsers.length === 0) {
-        select.innerHTML = `<option value="101">101 (ลูกห้องตัวอย่าง)</option>`;
+        select.innerHTML = `<option value="101">101 (ลูกห้องอนุมัติแล้ว)</option>`;
     } else {
         select.innerHTML = filteredUsers.map(u => `<option value="${u.room}">${u.room} (${u.name})</option>`).join("");
     }
@@ -19,7 +19,7 @@ function setItemCount(count) {
 }
 
 function renderItemPhotoDropzones() {
-    const qty = Math.max(1, Math.min(10, parseInt(document.getElementById("intake-item-count").value || 1)));
+    const qty = Math.max(1, Math.min(10, parseInt(document.getElementById("intake-item-count")?.value || 1)));
     const container = document.getElementById("dynamic-photos-container");
     if (!container) return;
     intakeUploadedPhotos = {};
@@ -71,7 +71,7 @@ function setMockPhotoForIndex(index) {
 }
 
 function fillMockAllPhotos() {
-    const qty = Math.max(1, Math.min(10, parseInt(document.getElementById("intake-item-count").value || 1)));
+    const qty = Math.max(1, Math.min(10, parseInt(document.getElementById("intake-item-count")?.value || 1)));
     for (let i = 0; i < qty; i++) setMockPhotoForIndex(i);
     showToast("✨ ใส่รูปถ่ายตัวอย่างเรียบร้อยทุกชิ้น", "info");
 }
@@ -111,7 +111,10 @@ function handleParcelIntake(e) {
     saveData();
     renderAllViews();
 
-    showLinePopup(`📦 มีพัสดุใหม่ถึงตึกแล้ว!\nสถานที่: ${building} - ห้อง ${room}\nรหัส: ${parcelId} (รวม ${qty} ชิ้น)\nโปรดตรวจรูปและเปิด QR เพื่อสแกนรับ`);
+    showLinePopup(`📦 มีพัสดุใหม่ถึงตึกแล้ว!
+สถานที่: ${building} - ห้อง ${room}
+รหัส: ${parcelId} (รวม ${qty} ชิ้น)
+โปรดตรวจรูปและเปิด QR เพื่อสแกนรับ`);
     showToast(`✅ บันทึกพัสดุ ${parcelId} สำเร็จ! แจ้งเตือนไปยัง LINE ลูกห้องเรียบร้อย`, "success");
 
     document.getElementById("intake-note").value = "";
