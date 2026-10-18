@@ -7,7 +7,6 @@ function renderResidentCards() {
     document.getElementById("resident-room-title").textContent = `${currentUser.building} - ห้อง ${currentUser.room}`;
     document.getElementById("resident-name-title").textContent = `ผู้ใช้งาน: ${currentUser.name} (${currentUser.provider === 'line' ? 'เข้าผ่าน LINE' : 'ไอดี: ' + currentUser.userId})`;
 
-    // กรองแสดงพัสดุเฉพาะตึกและเลขห้องของไอดีที่เข้าสู่ระบบเท่านั้น
     const myParcels = parcels.filter(p => p.building === currentUser.building && p.room === currentUser.room);
 
     if (myParcels.length === 0) {
@@ -120,7 +119,9 @@ function cancelPiece(parcelId, pieceNo) {
     saveData(); renderAllViews();
 
     triggerGuardCancelAlert(p.building, p.room, parcelId, pieceNo);
-    showLinePopup(`🚨 URGENT ALERT ถึง รปภ.!\nลูกห้อง ${p.building} ห้อง ${p.room} กดปฏิเสธพัสดุ ${parcelId} (#${pieceNo})\nโปรดนำออกจากจุดเก็บพัสดุทันที`);
+    showLinePopup(`🚨 URGENT ALERT ถึง รปภ.!
+ลูกห้อง ${p.building} ห้อง ${p.room} กดปฏิเสธพัสดุ ${parcelId} (#${pieceNo})
+โปรดนำออกจากจุดเก็บพัสดุทันที`);
     showToast(`⚠️ แจ้ง รปภ. เรียบร้อยแล้วว่าพัสดุชิ้นนี้ไม่ใช่ของคุณ`, "info");
 }
 
