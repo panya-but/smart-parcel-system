@@ -1,3 +1,4 @@
+// บันทึกและรับข้อมูลสถานะระบบ
 const INITIAL_USERS = [
     { id: "ADM-001", userId: "admin", username: "admin", passcode: "1234", name: "ผู้ดูแลระบบ (นิติบุคคล)", building: "ส่วนกลาง", room: "Admin Office", email: "admin@condo.com", provider: "email", role: "admin", status: "approved", regDate: "2024-01-01" },
     { id: "GRD-001", userId: "guard01", username: "guard01", passcode: "1234", name: "นายสมศักดิ์ (รปภ.กะเช้า)", building: "ส่วนกลาง", room: "GuardStation", email: "guard@condo.com", provider: "email", role: "guard", status: "approved", regDate: "2024-01-01" },
@@ -28,6 +29,7 @@ function loadData() {
         if (savedLogs) auditLogs = JSON.parse(savedLogs);
         else auditLogs = [{ id: Date.now(), action: "SYSTEM_INIT", details: "เริ่มต้นใช้งานระบบจัดการพัสดุ", by: "System", time: new Date().toLocaleString("th-TH") }];
 
+        // โหลด currentUser จาก sessionStorage (เมื่อรีเฟรชหน้าจะยังคงอยู่ แต่เมื่อปิดแท็บ/บราวเซอร์จะหายไป)
         const savedCurrent = sessionStorage.getItem("smart_current_user_v6");
         if (savedCurrent) {
             const parsed = JSON.parse(savedCurrent);
@@ -49,6 +51,8 @@ function saveData() {
         localStorage.setItem("smart_users_v6", JSON.stringify(users));
         localStorage.setItem("smart_parcels_v6", JSON.stringify(parcels));
         localStorage.setItem("smart_audit_logs_v6", JSON.stringify(auditLogs));
+
+        // บันทึกสถานะการล็อกอินปัจจุบันไว้ใน sessionStorage เพื่อรองรับการกด Refresh (F5)
         if (currentUser) {
             sessionStorage.setItem("smart_current_user_v6", JSON.stringify(currentUser));
         } else {
